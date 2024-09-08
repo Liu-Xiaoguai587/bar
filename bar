@@ -1,0 +1,101 @@
+#!/usr/local/bin/node
+
+const  { exec } = require("node:child_process");
+const shell = require("shelljs");
+const config = require("./config");
+const widgets = require("./widget");
+//let commond = `echo 1 2 3 4 5 6 7 8 9 | lemonbar ${config.flag} -f ${config.font} -g 300x40+10+10 -B \"#fff\" -F \"#000\"`
+
+// Main
+let x_offset_left = config.gap;
+let x_offset_right = config.screen_pixel_x;
+// let x_offset_right = 0;
+// exec("xrandr --current | head -n 1", (err, stdout, stderr) => {
+//   if(err) {
+//     console.error(`exec err: ${err}`);
+//     console.error(`exec stderr: ${stderr}`);
+//   }
+//   x_offset_right = stdout
+//     .split(",")[1]
+//     .split(" ")[2];
+//   x_offset_right = Number(x_offset_right);
+//   if(x_offset_right === 0) {
+//     console.error("error: try to get screen pixel fail");
+//   }
+// });
+
+
+for(const index in widgets) {
+  const widget = widgets[index];
+
+  // start with position_x
+  let position_x = 0;
+  if(widget.position == "right") {
+    x_offset_right -= widget.len * config.font_size;
+    x_offset_right -= config.gap;
+    position_x = x_offset_right - 10;
+
+  } else {
+    position_x = x_offset_left + 10;
+    x_offset_left += widget.len * config.font_size;
+    x_offset_left += config.gap;
+  }
+
+  // inner gap
+  if(widget.inner_gap != 0 | widget.inner_gap != null) {
+    inner_gap = " ".repeat(widget.inner_gap);
+
+    // echo " $(echo "some command") "
+    //       ^----------------------^--> The inner gap
+    widget.command = `${inner_gap}\$(${widget.command})${inner_gap}`;
+  }
+
+  // TODO
+  // action
+  if(widget.action != null) {
+    if(widget.action.lclick != null) {
+      widget.command = `%{A:${widget.action.lclick}:}`.concat(widget.command.concat("%{A}"));
+    }
+    if(widget.action.mclick != null) {
+      widget.command = `%{A2:${widget.action.mclick}:}`.concat(widget.command.concat("%{A}"));
+    }
+    if(widget.action.rclick != null) {
+      widget.command = `%{A3:${widget.action.rclick}:}`.concat(widget.command.concat("%{A}"));
+    }
+    if(widget.action.scroll_up != null) {
+      widget.command = `%{A4:${widget.action.scroll_up}:}`.concat(widget.command.concat("%{A}"));
+    }
+    if(widget.action.scroll_down != null) {
+      widget.command = `%{A5:${widget.action.scroll_down}:}`.concat(widget.command.concat("%{A}"));
+    }
+  }
+
+  // align
+  if(widget.align != null) {
+    const align = `%{${widget.align[0]}}`
+    widget.command = `${align}${widget.command}${align}`;
+  }
+
+  let command = 
+    `while true; do \n` +
+    `echo "${widget.command}"\n` +
+    `sleep ${widget.interval}\n` +
+    `done ` +
+    `| lemonbar ${config.flag} ` +
+    `-f \"${config.font}\"-${config.font_size} ` +
+    `-g ${widget.len * config.font_size}x${config.font_size * 2}+${position_x}+${config.gap_top} ` +
+    `-F \"${widget.color.foreground}\" ` +
+    `-B \"${widget.color.background}\" `;
+  console.log(command + "\n");
+
+  const runtime = shell.exec(command, {async: true, silent: true});
+  runtime.stdout.on('data', (data) => {
+    // console.log(data);
+    shell.exec(data);
+  });
+
+
+}
+
+
+
