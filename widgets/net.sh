@@ -8,8 +8,8 @@ net_quality=$(iwconfig wlp1s0 | awk '/Link Quality/ {print $2}' | awk -F= '{prin
 net_quality=${net_quality%/70}
 
 if [[ -z "$net_quality" ]]; then
-    net_quality="    "
-    echo "    "
+    net_quality=" "
+    echo " "
 elif (( $net_quality > 55 )); then
     # net_quality="󰤨"
     net_quality=" ▂▄▆█"

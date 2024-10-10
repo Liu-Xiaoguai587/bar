@@ -41,23 +41,23 @@ const widgets = {
     align: "center"
   },
 
-  cpu: {
-    color: {
-      foreground: color.color5,
-      background: color.background
-    },
-    action: {
-      lclick: "kitty bash -c \\\"htop -s PERCENT_CPU; exit\\\"",
-      mclick: null,
-      rclick: null
-    },
-    position: "left",
-    command: `mpstat 1 1 | awk '/all/ {print " "100-$12"%"}' | tail -n 1`,
-    len : 9,
-    interval : 2,
-    inner_gap : 1,
-    align: "center"
-  },
+  // cpu: {
+  //   color: {
+  //     foreground: color.color5,
+  //     background: color.background
+  //   },
+  //   action: {
+  //     lclick: "kitty bash -c \\\"htop -s PERCENT_CPU; exit\\\"",
+  //     mclick: null,
+  //     rclick: null
+  //   },
+  //   position: "left",
+  //   command: `mpstat 1 1 | awk '/all/ {print " "100-$12"%"}' | tail -n 1`,
+  //   len : 9,
+  //   interval : 2,
+  //   inner_gap : 1,
+  //   align: "center"
+  // },
 
   wifi: {
     color: {
